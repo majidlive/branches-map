@@ -1,26 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
+  <meta charset="UTF-8">
   <title>فروع شركة عبد الواحد</title>
   <style>
     #map { height: 100vh; width: 100%; }
+    body { margin: 0; font-family: Arial; direction: rtl; text-align: right; }
+    h2 { padding: 10px; background: #eee; margin: 0; }
   </style>
 </head>
 <body>
-  <h2>خريطة الفروع</h2>
+  <h2>فروع شركة عبد الواحد – جدة</h2>
   <div id="map"></div>
 
   <script>
     function initMap() {
       const map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 21.543333, lng: 39.172778 },
-        zoom: 11
+        zoom: 12
       });
 
-      const marker = new google.maps.Marker({
-        position: { lat: 21.543333, lng: 39.172778 },
-        map: map,
-        title: "فرع جدة – مثال فقط"
+      const branches = [
+        {
+          name: "فرع السلام مول – جدة",
+          position: { lat: 21.5650, lng: 39.2262 },
+          phone: "0534100133",
+          hours: "السبت – الخميس: 10ص–11م | الجمعة: 5م–11م",
+          accessories: "متوفرة"
+        },
+        {
+          name: "فرع نجود سنتر – جدة",
+          position: { lat: 21.5335, lng: 39.1643 },
+          phone: "0556656765",
+          hours: "السبت – الخميس: 10ص–11م | الجمعة: 5م–11م",
+          accessories: "غير متوفرة"
+        }
+      ];
+
+      branches.forEach(branch => {
+        const marker = new google.maps.Marker({
+          position: branch.position,
+          map: map,
+          title: branch.name
+        });
+
+        const info = `
+          <div style="font-size:14px;">
+            <strong>${branch.name}</strong><br>
+            الهاتف: <a href="tel:${branch.phone}">${branch.phone}</a><br>
+            الدوام: ${branch.hours}<br>
+            أكسسوارات تصوير: ${branch.accessories}
+          </div>
+        `;
+
+        const infowindow = new google.maps.InfoWindow({ content: info });
+
+        marker.addListener("click", () => {
+          infowindow.open(map, marker);
+        });
       });
     }
   </script>
