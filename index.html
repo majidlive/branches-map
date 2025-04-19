@@ -1,36 +1,38 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>فروع شركة عبد الواحد</title>
+  <meta charset="UTF-8" />
+  <title>فروع شركة عبد الواحد – جدة</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-sA+e2Y01G6kzG/Mm0sDyAJ0Ppx2G2t1p3p3V/2y+4nE="
+    crossorigin=""
+  />
   <style>
-    body {
-      margin: 0; font-family: Arial; direction: rtl; text-align: right;
-    }
-    h2 {
-      padding: 10px; background: #eee; margin: 0;
-    }
+    body { margin: 0; font-family: Arial; direction: rtl; text-align: right; }
+    #map { height: 90vh; width: 100%; }
     #controls {
       padding: 10px;
       background: #f9f9f9;
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
-      align-items: center;
-    }
-    #map {
-      height: 90vh;
-      width: 100%;
+      flex-wrap: wrap;
     }
     input, select {
       padding: 6px;
       font-size: 14px;
     }
+    h2 {
+      padding: 10px;
+      margin: 0;
+      background: #eee;
+    }
   </style>
 </head>
 <body>
   <h2>فروع شركة عبد الواحد – جدة</h2>
-
   <div id="controls">
     <input type="text" id="search" placeholder="ابحث باسم الفرع...">
     <select id="filter">
@@ -39,69 +41,52 @@
       <option value="no">فروع بدون أكسسوارات</option>
     </select>
   </div>
-
   <div id="map"></div>
 
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-GZC39jAHb5QYcGYNbBbhZeb7r9Pa+ZtP+fGZ1JlqsoY="
+    crossorigin=""
+  ></script>
   <script>
-    let map;
-    let markers = [];
+    const map = L.map('map').setView([21.543333, 39.172778], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
     const branches = [
       {
         name: "فرع السلام مول – جدة",
-        position: { lat: 21.5650, lng: 39.2262 },
+        position: [21.5650, 39.2262],
         phone: "0534100133",
         hours: "السبت – الخميس: 10ص–11م | الجمعة: 5م–11م",
         accessories: "متوفرة"
       },
       {
         name: "فرع نجود سنتر – جدة",
-        position: { lat: 21.5335, lng: 39.1643 },
+        position: [21.5335, 39.1643],
         phone: "0556656765",
         hours: "السبت – الخميس: 10ص–11م | الجمعة: 5م–11م",
         accessories: "غير متوفرة"
       }
     ];
 
-    function initMap() {
-      map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 21.543333, lng: 39.172778 },
-        zoom: 12
-      });
-
-      renderMarkers(branches);
-
-      document.getElementById("search").addEventListener("input", filterBranches);
-      document.getElementById("filter").addEventListener("change", filterBranches);
-    }
+    let markers = [];
 
     function renderMarkers(data) {
-      // حذف كل العلامات السابقة
-      markers.forEach(marker => marker.setMap(null));
+      // إزالة العلامات القديمة
+      markers.forEach(marker => map.removeLayer(marker));
       markers = [];
 
       data.forEach(branch => {
-        const marker = new google.maps.Marker({
-          position: branch.position,
-          map: map,
-          title: branch.name
-        });
-
-        const info = `
-          <div style="font-size:14px;">
-            <strong>${branch.name}</strong><br>
-            الهاتف: <a href="tel:${branch.phone}">${branch.phone}</a><br>
-            الدوام: ${branch.hours}<br>
-            أكسسوارات تصوير: ${branch.accessories}
-          </div>
-        `;
-
-        const infowindow = new google.maps.InfoWindow({ content: info });
-
-        marker.addListener("click", () => {
-          infowindow.open(map, marker);
-        });
-
+        const marker = L.marker(branch.position).addTo(map);
+        marker.bindPopup(`
+          <strong>${branch.name}</strong><br>
+          الهاتف: <a href="tel:${branch.phone}">${branch.phone}</a><br>
+          الدوام: ${branch.hours}<br>
+          أكسسوارات التصوير: ${branch.accessories}
+        `);
         markers.push(marker);
       });
     }
@@ -122,8 +107,11 @@
 
       renderMarkers(filtered);
     }
-  </script>
 
-  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBTLXIUWLXbBqdkMkMeFb7w-u7B4JE&callback=initMap"></script>
+    document.getElementById("search").addEventListener("input", filterBranches);
+    document.getElementById("filter").addEventListener("change", filterBranches);
+
+    renderMarkers(branches);
+  </script>
 </body>
 </html>
